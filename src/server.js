@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-
+const {FieldValue} = require('firebase-admin/firestore')
 const cors=require('cors');
 app.use(cors())
 app.use(express.json());
@@ -25,11 +25,15 @@ app.get('/api/login',(req,res)=> {
   //   res.json(al2);
   // });
 
-  console.log(req.query);
+
 
   // const res ={};
 
-  db.collection('iniciar-registrar').doc('8X8qyKzfzPYPdqlUA6Ut').set(req.query).then(r => {
+  db.collection('iniciar-registrar').doc('8X8qyKzfzPYPdqlUA6Ut').set(
+    {client:FieldValue.arrayUnion({
+        email:'aaaaaaa',
+        password:'Tu rima 33'
+      })},{merge:true}).then(r => {
     console.log("dades inserides");
   })
 });
