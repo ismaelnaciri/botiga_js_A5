@@ -202,6 +202,29 @@ app.post('/datausers', async (req, res) => {
 });
 
 
+//Contacte log
+app.post('/api/escriure', (req, res) => {
+  const correu = req.body.email;
+  const name = req.body.name;
+  const missatge = req.body.missatge;
+  const now = Date.now();
+  const nomArxiu = correu + `${now}.txt`;
+  console.log(nomArxiu);
+
+  fs.appendFile("C:\\IdeaProjects\\botiga_js\\src\\Messages\\" + nomArxiu, ' ', (error) => {
+    if (error) throw error;
+    else console.log("Arxiu creat");
+  })
+
+  const writableStream = fs.createWriteStream("C:\\IdeaProjects\\botiga_js\\src\\Messages\\" + nomArxiu)
+  console.log("Test");
+  writableStream.write("Correu: " + toString() + correu + "\n");
+  writableStream.write("Nom: " + toString() + name + "\n");
+  writableStream.write("Missatge: " + toString() + missatge + "\n");
+
+})
+
+
 
 */
 
