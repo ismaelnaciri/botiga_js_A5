@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const {FieldValue} = require('firebase-admin/firestore')
 const cors=require('cors');
+const fs = require("fs");
 app.use(cors())
 app.use(express.json());
 port = 3080;
@@ -31,11 +32,21 @@ app.get('/api/login',(req,res)=> {
 
   db.collection('iniciar-registrar').doc('8X8qyKzfzPYPdqlUA6Ut').set(
     {client:FieldValue.arrayUnion({
+        nom:'',
         email:'aaaaaaa',
         password:'Tu rima 33'
       })},{merge:true}).then(r => {
     console.log("dades inserides");
   })
 });
+
+app.get('/imatges/:nom',(req,res)=>{
+  const nomImatge = req.params.nom;
+  const rutaImatge = `../IMG/${nomImatge}`;
+  const stream = fs.createReadStream(rutaImatge);
+  stream.pipe(res);
+})
+
+
 
 
