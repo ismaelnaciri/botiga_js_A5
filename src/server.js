@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config({ path: '../.env' });
+const uuid = require('uuid')
 
 const app = express();
 
@@ -9,6 +10,7 @@ const cors=require('cors');
 const fs = require("fs");
 
 const Sequelize = require("sequelize");
+const {NOW} = require("sequelize");
 
 const sequelize = new Sequelize(
   process.env.DB_DATABASE,
@@ -46,11 +48,39 @@ const Product = sequelize.define("productes", {
   }
 });
 
+const Compras = sequelize.define("compres",{
+  idfactura:{
+    type: Sequelize.STRING,
+    primaryKey: true
+  },usuari:{
+    type: Sequelize.STRING,
+    allowNull: true
+  },idproducte:{
+    type: Sequelize.INTEGER,
+    primaryKey: true
+  },oferta:{
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: false
+  },quantitat:{
+    type: Sequelize.INTEGER,
+    allowNull: false
+  },data:{
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+    allowNull: false
+  }
+});
+
+//Product.belongsTo(Compras, { onDelete: "NO ACTION", onUpdate: "NO ACTION" });
+//Compras.hasOne(Product, { onDelete: "NO ACTION", onUpdate: "NO ACTION" });
+
 sequelize.sync().then(()=>{
   console.log('Base de dades sincroniotzada');
 }).catch((error) => {
   console.error("No s'ha pogut sincronitzar", error);
-})
+});
+
 
 app.use(cors());
 app.use(express.json());
@@ -69,17 +99,44 @@ app.get('/productes', async (req, res) => {
     console.error("Han fallat els productes", error)
   })
 
-})
+});
+
+app.get('/imatges/:nom',(req,res)=>{
+  const nomImatge = req.params.nom;
+  const rutaImatge = `../IMG/${nomImatge}`;
+  const stream = fs.createReadStream(rutaImatge);
+  stream.pipe(res);
+});
 
 
-var admin = require("firebase-admin");
+app.post('/compres', async (req, res) => {
+  const items = req.body.json;
+  const idFactura = uuid.v4();
+  items.forEach(function(item) {
+    Compras.create({
+      idfactura: idFactura,
+      usuari: '',
+      idproducte: item.idproducte,
+      oferta: item.oferta,
+      quantitat: item.quantity
+    }).catch((err)=>{
+      if (err){
+        console.error('Ha hagut un error ', err)
+      }
+    })
+  });
+
+});
+
+/*var admin = require("firebase-admin");
 var serviceAccount = require("./botiga-61177-firebase-adminsdk-a1p5h-9b6614abd8.json");
 const {getFirestore} = require("firebase-admin/firestore");
 const {request} = require("express");
 const {DataTypes} = require("sequelize");
+const {compileInjector} = require("@angular/compiler");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.crecdential.cert(serviceAccount)
 });
 const db = getFirestore(app);
 
@@ -120,13 +177,8 @@ app.post('/datausers', async (req, res) => {
 });
 
 
-app.get('/imatges/:nom',(req,res)=>{
-  const nomImatge = req.params.nom;
-  const rutaImatge = `../IMG/${nomImatge}`;
-  const stream = fs.createReadStream(rutaImatge);
-  stream.pipe(res);
-})
 
+*/
 
 
 /*
