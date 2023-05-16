@@ -5,7 +5,6 @@ const uuid = require('uuid')
 
 const app = express();
 
-const {FieldValue} = require('firebase-admin/firestore')
 const cors=require('cors');
 const fs = require("fs");
 
@@ -72,9 +71,6 @@ const Compras = sequelize.define("compres",{
   }
 });
 
-//Product.belongsTo(Compras, { onDelete: "NO ACTION", onUpdate: "NO ACTION" });
-//Compras.hasOne(Product, { onDelete: "NO ACTION", onUpdate: "NO ACTION" });
-
 sequelize.sync().then(()=>{
   console.log('Base de dades sincroniotzada');
 }).catch((error) => {
@@ -128,17 +124,37 @@ app.post('/compres', async (req, res) => {
 
 });
 
-/*var admin = require("firebase-admin");
-var serviceAccount = require("./botiga-61177-firebase-adminsdk-a1p5h-9b6614abd8.json");
-const {getFirestore} = require("firebase-admin/firestore");
-const {request} = require("express");
-const {DataTypes} = require("sequelize");
-const {compileInjector} = require("@angular/compiler");
 
-admin.initializeApp({
-  credential: admin.crecdential.cert(serviceAccount)
+//prueba numero 1
+
+
+const {FieldValue} = require("firebase-admin/firestore");
+var admin = require("firebase-admin");
+var serviceAccount = require("./botiga-danisma-firebase-adminsdk-my3wq-9d1b270bca.json");
+const {getFirestore} = require("firebase-admin/firestore");
+const ap = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
 });
-const db = getFirestore(app);
+const db = getFirestore(ap);
+
+
+app.get('/api/login',(req,res)=> {
+  console.log("fino")
+
+
+  db.collection('iniciar-registre').doc('yWikbVf2wyCyqnyRkE8z').set(
+    {clients:FieldValue.arrayUnion({
+        nom:'saggaaa',
+        email:'gggaaaaa',
+        password:'jogggggseeeeee'
+      })},{merge:true}).then(r=>{
+    console.log("dades inserides")
+  })
+
+})
+/*
+
+
 
 baseDades();
 async function baseDades() {
