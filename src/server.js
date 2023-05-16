@@ -138,19 +138,27 @@ const ap = admin.initializeApp({
 const db = getFirestore(ap);
 
 
-app.get('/api/login',(req,res)=> {
+app.post('/api/login',async (req,res)=> {
   console.log("fino")
+  const dades = req.body.json;
 
-
-  db.collection('iniciar-registre').doc('yWikbVf2wyCyqnyRkE8z').set(
-    {clients:FieldValue.arrayUnion({
-        nom:'saggaaa',
-        email:'gggaaaaa',
-        password:'jogggggseeeeee'
-      })},{merge:true}).then(r=>{
-    console.log("dades inserides")
-  })
-
+  console.log(dades)
+    dades.forEach(function(dada) {
+      db.collection('iniciar-registre').doc('yWikbVf2wyCyqnyRkE8z').set(
+        {
+          clients: FieldValue.arrayUnion({
+            nom: dada.nom,
+            email: dada.correu,
+            password: dada.contrasenya
+          })
+        }, {merge: true}).then(r => {
+        console.log("dades inserides")
+      }).catch((err) => {
+        if (err) {
+          console.error(err)
+        }
+      })
+    })
 })
 /*
 
