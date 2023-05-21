@@ -6,8 +6,7 @@ const uuid = require('uuid')
 const app = express();
 const fs = require('fs');
 
-const cors=require('cors');
-const fs = require("fs");
+const cors = require('cors');
 
 const Sequelize = require("sequelize");
 const {NOW} = require("sequelize");
@@ -69,6 +68,9 @@ const Compras = sequelize.define("compres",{
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW,
     allowNull: false
+  },moneda: {
+    type: Sequelize.STRING,
+    allowNull: false
   }
 });
 
@@ -115,7 +117,8 @@ app.post('/compres', async (req, res) => {
       usuari: '',
       idproducte: item.idproducte,
       oferta: item.oferta,
-      quantitat: item.quantity
+      quantitat: item.quantity,
+      moneda: item.coin
     }).catch((err)=>{
       if (err){
         console.error('Ha hagut un error ', err)
