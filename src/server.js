@@ -68,11 +68,16 @@ const Compras = sequelize.define("compres",{
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW,
     allowNull: false
-  },moneda: {
+  },cost : {
+    type: Sequelize.DECIMAL(10,2),
+    allowNull: false
+  }
+  ,moneda: {
     type: Sequelize.STRING,
     allowNull: false
   }
 });
+
 
 sequelize.sync().then(()=>{
   console.log('Base de dades sincroniotzada');
@@ -81,8 +86,10 @@ sequelize.sync().then(()=>{
 });
 
 
+
 app.use(cors());
 app.use(express.json());
+
 
 port = 3080;
 
@@ -118,6 +125,7 @@ app.post('/compres', async (req, res) => {
       idproducte: item.idproducte,
       oferta: item.oferta,
       quantitat: item.quantity,
+      cost: item.price,
       moneda: item.coin
     }).catch((err)=>{
       if (err){
@@ -143,8 +151,9 @@ const db = getFirestore(ap);
 
 
 app.post('/api/login',async (req,res)=> {
-  console.log("fino")
+
   const dades = req.body.json;
+
 
   console.log(dades)
     dades.forEach(function(dada) {
