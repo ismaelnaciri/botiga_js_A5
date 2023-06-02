@@ -1,7 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const multer = require('multer');
-dotenv.config({ path: '../isma.env' });
+dotenv.config({ path: 'C:\\IdeaProjects\\botiga_js\\isma.env' });
 const {FieldValue, getFirestore} = require('firebase-admin/firestore')
 const uuid = require('uuid')
 
@@ -136,49 +136,16 @@ app.post('/compres', async (req, res) => {
 //Botiga A4
 
 
+// const {FieldValue} = require("firebase-admin/firestore");
 var admin = require("firebase-admin");
-const {request} = require("express");
-const Process = require("process");
-var serviceAccount;
-var fitxer;
-var db;
-
-fs.readFile('./ConnexioFirebase','utf-8',(error, contingut)=> {
-  if (error){
-    console.error(error);
-    return;
-  }else {
-    fitxer = contingut;
-    serviceAccount = require(fitxer);
-    const {getFirestore} = require("firebase-admin/firestore");
-    const {firestore} = require("firebase-admin");
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
-    db = getFirestore();
-    dbConnection().then((patata) => {
-      console.log(patata);
-    });
-  }
+var serviceAccount = require("./botiga-danisma-firebase-adminsdk-my3wq-9d1b270bca.json");
+// const {getFirestore} = require("firebase-admin/firestore");
+const stream = require("stream");
+const ap = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
 });
+const db = getFirestore(ap);
 
-async function dbConnection(){
-  const conn = db.collection("book-net").doc("clients");
-  const doc = await conn.get();
-  if (!doc.exists){
-    console.log("El document no existeix!")
-  }else{
-    app.get('/api/firebase',async (req, res) => {
-
-      const conn = db.collection("book-net").doc("clients");
-      const doc = await conn.get();
-
-      const document = doc.data();
-      res.json(document);
-    })
-
-  }
-}
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -201,17 +168,42 @@ app.post('/signup', async (req, res) =>{
   res.json(userResponse);
 })
 
-app.post('/datausers',(req, res) => {
-  db.collection("book-net").doc("clients").set({
-    clients: FieldValue.arrayUnion({
-      Adreca: req.body.Adreca,
-      Cognoms: req.body.Cognoms,
-      Correu: req.body.Correu,
-      Nom: req.body.Nom,
-      Telefon: req.body.Telefon,
-      Rol: req.body.Rol})
-  },{merge:true})
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await db.collection('clients')
+    .where('email', '==', email)
+    .where('password', '==', password)
+    .get();
+
+
+  if (user.empty) {
+
+    return res.send(false);
+  } else {
+    const data = user.docs[0].data();
+    console.log(typeof data)
+    const info= {
+      nomPersona: data.nom,
+      emailPersona: data.email,
+      contrasenyaPersona: data.password
+    }
+    return res.send(info);
+  }
+});
+
+app.post('/datausers',async (req, res) => {
+  await admin.auth().createUser({
+    Adreca: req.body.Adreca,
+    Cognoms: req.body.Cognoms,
+    Correu: req.body.Correu,
+    Nom: req.body.Nom,
+    Telefon: req.body.Telefon,
+    Rol: req.body.Rol
+  })
 })
+
 
 app.post('/datausersdelete',(req, res) => {
   db.collection("book-net").doc("clients").update({
